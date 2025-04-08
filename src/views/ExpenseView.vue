@@ -1,14 +1,14 @@
 <template>
   <div class="expenses bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-lg shadow-sm">
-        <h1 class="text-3xl font-bold text-gray-800">Chi tiêu nhóm {{ group?.name || 'Đang tải...' }}</h1>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 sm:space-y-0">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 text-center sm:text-left">Chi tiêu nhóm {{ group?.name || 'Đang tải...' }}</h1>
         <button 
           @click="router.back()"
-          class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center"
+          class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Quay lại
         </button>
@@ -102,10 +102,10 @@
               </div>
               <div class="text-right">
                 <p class="font-semibold text-gray-800">{{ formatCurrency(expense.amount) }}</p>
-                <div class="space-x-2 mt-2">
+                <div class="mt-2">
                   <button 
                     @click="startEdit(expense)"
-                    class="text-blue-600 hover:text-blue-800 transition-colors flex items-center text-sm"
+                    class="text-blue-600 hover:text-blue-800 transition-colors flex items-center text-sm mb-2"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -257,4 +257,4 @@ defineExpose({
   margin: 0 auto;
   padding: 2rem;
 }
-</style> 
+</style>

@@ -1,28 +1,28 @@
 <template>
   <div class="group bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-lg shadow-sm">
-        <div class="flex items-center">
-          <h1 class="text-3xl font-bold text-gray-800">{{ group?.name || 'Đang tải...' }}</h1>
-          <div class="ml-6 flex space-x-4">
-            <button 
-              @click="navigateToExpenses"
-              class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Thêm chi tiêu
-            </button>
-            <button 
-              @click="navigateToSettlement"
-              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-              Xem kết quả
-            </button>
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 md:space-y-0">
+        <div class="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0">
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">{{ group?.name || 'Đang tải...' }}</h1>
+          <div class="mt-4 md:mt-0 md:ml-6 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+        <button 
+          @click="navigateToExpenses"
+          class="bg-green-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Thêm chi tiêu
+        </button>
+        <button 
+          @click="navigateToSettlement"
+          class="bg-blue-600 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          Xem kết quả
+        </button>
           </div>
         </div>
       </div>

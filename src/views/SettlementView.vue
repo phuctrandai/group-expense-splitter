@@ -1,11 +1,11 @@
 <template>
   <div class="settlement bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-lg shadow-sm">
-        <h1 class="text-3xl font-bold text-gray-800">Kết quả chia tiền nhóm {{ group?.name || 'Đang tải...' }}</h1>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 sm:space-y-0">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 text-center sm:text-left">Kết quả chia tiền nhóm {{ group?.name || 'Đang tải...' }}</h1>
         <button 
           @click="router.back()"
-          class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center"
+          class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />

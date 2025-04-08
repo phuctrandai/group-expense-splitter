@@ -55,7 +55,11 @@ export const useGroupStore = defineStore('group', {
     addExpense(groupId, expense) {
       const group = this.groups.find(g => g.id === groupId)
       if (group) {
-        group.expenses.push(expense)
+        const newExpense = {
+          id: Date.now().toString(), // Thêm id để phân biệt các expenses
+          ...expense
+        }
+        group.expenses.push(newExpense)
       }
     },
 
@@ -80,4 +84,4 @@ export const useGroupStore = defineStore('group', {
       this.currentGroupId = groupId
     }
   }
-}) 
+})
