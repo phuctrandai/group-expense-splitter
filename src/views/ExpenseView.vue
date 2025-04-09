@@ -3,15 +3,26 @@
     <div class="max-w-4xl mx-auto px-4 py-8">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 sm:space-y-0">
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 text-center sm:text-left">Chi tiêu nhóm {{ group?.name || 'Đang tải...' }}</h1>
-        <button 
-          @click="router.back()"
-          class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Quay lại
-        </button>
+        <div class="flex flex-row justify-between sm:justify-end sm:space-x-3 w-full sm:w-auto">
+          <button 
+            @click="navigateToSettlement"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center w-[48%] sm:w-auto"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            Xem kết quả
+          </button>
+          <button 
+            @click="router.back()"
+            class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center w-[48%] sm:w-auto"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Quay lại
+          </button>
+        </div>
       </div>
 
       <div v-if="group" class="mb-8 bg-white p-6 rounded-lg shadow-sm">
@@ -98,10 +109,10 @@
             </div>
           </div>
           
-          <div class="flex space-x-4 pt-2">
+          <div class="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
             <button 
               type="submit"
-              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+              class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
               :disabled="selectedMembers.length === 0"
               :class="{'opacity-50 cursor-not-allowed': selectedMembers.length === 0}"
             >
@@ -114,7 +125,7 @@
               v-if="editingExpense"
               type="button"
               @click="cancelEdit"
-              class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center"
+              class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -133,7 +144,7 @@
             :key="expense.id"
             class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div class="flex justify-between items-start">
+            <div class="flex flex-col sm:flex-row justify-between items-start space-y-3 sm:space-y-0">
               <div class="flex-1">
                 <div class="flex items-center mb-2">
                   <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
@@ -160,24 +171,24 @@
                   </div>
                 </div>
               </div>
-              <div class="flex space-x-2 ml-4">
-                <button 
-                  @click="startEdit(expense)"
-                  class="text-blue-600 hover:text-blue-800 transition-colors flex items-center text-sm"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  Sửa
-                </button>
+              <div class="flex flex-row justify-between sm:justify-end w-full sm:w-auto sm:ml-4">
                 <button 
                   @click="removeExpense(expense.id)"
-                  class="text-red-600 hover:text-red-800 transition-colors flex items-center text-sm"
+                  class="text-red-600 hover:text-red-800 transition-colors flex items-center justify-center text-sm"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                   Xóa
+                </button>
+                <button 
+                  @click="startEdit(expense)"
+                  class="text-blue-600 hover:text-blue-800 transition-colors flex items-center justify-center text-sm ml-8"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Sửa
                 </button>
               </div>
             </div>
@@ -323,6 +334,12 @@ const formatCurrency = (amount) => {
   }).format(amount)
 }
 
+const navigateToSettlement = () => {
+  if (group.value) {
+    router.push(`/group/${group.value.id}/settlement`)
+  }
+}
+
 // Export các hàm cần thiết
 defineExpose({
   startEdit,
@@ -331,7 +348,8 @@ defineExpose({
   addExpense,
   removeExpense,
   handleAmountInput,
-  toggleAllMembers
+  toggleAllMembers,
+  navigateToSettlement
 })
 </script>
 
