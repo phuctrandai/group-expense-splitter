@@ -16,14 +16,18 @@
 
       <div v-if="group" class="mb-8 bg-white p-6 rounded-lg shadow-sm">
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Tổng quan</h2>
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="grid gap-4" :class="{'md:grid-cols-2': isEqualParticipation}">
           <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
             <p class="text-gray-600 mb-2">Tổng chi tiêu:</p>
             <p class="text-2xl font-bold text-gray-800">{{ formatCurrency(totalExpenses) }}</p>
           </div>
-          <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+          <div class="p-4 border border-gray-200 rounded-lg bg-gray-50" v-if="isEqualParticipation">
             <p class="text-gray-600 mb-2">Số tiền mỗi người phải đóng:</p>
             <p class="text-2xl font-bold text-gray-800">{{ formatCurrency(perPersonAmount) }}</p>
+          </div>
+          <div class="p-4 border border-gray-200 rounded-lg bg-gray-50" v-else>
+            <p class="text-gray-600 mb-2">Chi tiết tham gia:</p>
+            <p class="text-md text-gray-800">Mỗi người đóng góp khác nhau tùy theo khoản chi tham gia</p>
           </div>
         </div>
       </div>
@@ -43,16 +47,18 @@
                 </div>
                 <div>
                   <h3 class="font-semibold text-gray-800">{{ member.name }}</h3>
-                  <p class="text-gray-600 text-sm mt-1">
-                    Đã chi: {{ formatCurrency(getMemberExpenses(member.id)) }}
-                  </p>
+                  <div class="text-gray-600 text-sm mt-1 space-y-1">
+                    <p>Đã chi: {{ formatCurrency(getMemberExpenses(member.id)) }}</p>
+                    <p>Cần trả: {{ formatCurrency(getMemberParticipationExpenses(member.id)) }}</p>
+                  </div>
                 </div>
               </div>
               <div class="text-right">
                 <p 
                   :class="{
                     'text-green-600': getMemberBalance(member.id) > 0,
-                    'text-red-600': getMemberBalance(member.id) < 0
+                    'text-red-600': getMemberBalance(member.id) < 0,
+                    'text-gray-600': getMemberBalance(member.id) === 0
                   }"
                   class="font-semibold text-lg"
                 >
@@ -61,11 +67,14 @@
                 <p 
                   :class="{
                     'text-green-600': getMemberBalance(member.id) > 0,
-                    'text-red-600': getMemberBalance(member.id) < 0
+                    'text-red-600': getMemberBalance(member.id) < 0,
+                    'text-gray-600': getMemberBalance(member.id) === 0
                   }"
                   class="text-sm"
                 >
-                  {{ getMemberBalance(member.id) > 0 ? 'Cần thu' : 'Cần trả' }}
+                  <span v-if="getMemberBalance(member.id) > 0">Cần thu</span>
+                  <span v-else-if="getMemberBalance(member.id) < 0">Cần trả</span>
+                  <span v-else>Đã cân bằng</span>
                 </p>
               </div>
             </div>
@@ -129,10 +138,41 @@ const totalExpenses = computed(() => {
   return group.value.expenses.reduce((sum, expense) => sum + expense.amount, 0)
 })
 
+// Kiểm tra xem tất cả thành viên có tham gia vào tất cả khoản chi không
+const isEqualParticipation = computed(() => {
+  if (!group.value || group.value.expenses.length === 0 || group.value.members.length === 0) return true
+  
+  // Kiểm tra nếu tất cả các khoản chi đều có tất cả thành viên tham gia
+  return group.value.expenses.every(expense => {
+    // Nếu không có splitBetween hoặc rỗng, coi như không tham gia
+    if (!expense.splitBetween || expense.splitBetween.length === 0) return false
+    
+    // Kiểm tra xem tất cả thành viên đều tham gia vào khoản chi này
+    return group.value.members.every(member => 
+      expense.splitBetween.includes(member.id)
+    )
+  })
+})
+
 const perPersonAmount = computed(() => {
   if (!group.value || group.value.members.length === 0) return 0
   return totalExpenses.value / group.value.members.length
 })
+
+const getMemberParticipationExpenses = (memberId) => {
+  if (!group.value) return 0
+  
+  let totalShare = 0
+  
+  group.value.expenses.forEach(expense => {
+    if (expense.splitBetween && expense.splitBetween.includes(memberId)) {
+      const perPersonShare = expense.amount / expense.splitBetween.length
+      totalShare += perPersonShare
+    }
+  })
+  
+  return totalShare
+}
 
 const getMemberExpenses = (memberId) => {
   if (!group.value) return 0
@@ -143,7 +183,8 @@ const getMemberExpenses = (memberId) => {
 
 const getMemberBalance = (memberId) => {
   const paid = getMemberExpenses(memberId)
-  return paid - perPersonAmount.value
+  const owes = getMemberParticipationExpenses(memberId)
+  return paid - owes
 }
 
 const paymentInstructions = computed(() => {
@@ -158,6 +199,9 @@ const paymentInstructions = computed(() => {
   const debtors = balances.filter(b => b.balance < 0)
   const creditors = balances.filter(b => b.balance > 0)
   
+  debtors.sort((a, b) => a.balance - b.balance)
+  creditors.sort((a, b) => b.balance - a.balance)
+  
   const instructions = []
   let debtorIndex = 0
   let creditorIndex = 0
@@ -166,21 +210,21 @@ const paymentInstructions = computed(() => {
     const debtor = debtors[debtorIndex]
     const creditor = creditors[creditorIndex]
     
-    const amount = Math.min(-debtor.balance, creditor.balance)
+    const amount = Math.min(Math.abs(debtor.balance), creditor.balance)
     
     if (amount > 0) {
       instructions.push({
         from: debtor.name,
         to: creditor.name,
-        amount: amount
+        amount: Math.round(amount)
       })
     }
 
     debtor.balance += amount
     creditor.balance -= amount
 
-    if (debtor.balance === 0) debtorIndex++
-    if (creditor.balance === 0) creditorIndex++
+    if (Math.abs(debtor.balance) < 1) debtorIndex++
+    if (Math.abs(creditor.balance) < 1) creditorIndex++
   }
 
   return instructions

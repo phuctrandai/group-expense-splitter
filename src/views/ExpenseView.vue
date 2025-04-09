@@ -60,10 +60,50 @@
               </option>
             </select>
           </div>
+          
+          <div>
+            <label class="block mb-2 text-gray-700 font-medium">Chia cho:</label>
+            <div class="space-y-3 border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="selectAll" 
+                  :checked="isAllMembersSelected"
+                  @change="toggleAllMembers"
+                  class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                >
+                <label for="selectAll" class="ml-2 font-medium text-gray-700">Tất cả mọi người</label>
+              </div>
+              
+              <div class="mt-3 space-y-2 pl-6">
+                <div 
+                  v-for="member in group.members" 
+                  :key="member.id"
+                  class="flex items-center"
+                >
+                  <input 
+                    type="checkbox" 
+                    :id="`member-${member.id}`" 
+                    v-model="selectedMembers"
+                    :value="member.id"
+                    class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                  >
+                  <label :for="`member-${member.id}`" class="ml-2 text-gray-700">{{ member.name }}</label>
+                </div>
+              </div>
+              
+              <div v-if="selectedMembers.length === 0" class="pl-6 text-red-500 text-sm">
+                Vui lòng chọn ít nhất một thành viên
+              </div>
+            </div>
+          </div>
+          
           <div class="flex space-x-4 pt-2">
             <button 
               type="submit"
               class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+              :disabled="selectedMembers.length === 0"
+              :class="{'opacity-50 cursor-not-allowed': selectedMembers.length === 0}"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -93,35 +133,52 @@
             :key="expense.id"
             class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="font-semibold text-gray-800">{{ expense.category }}</h3>
-                <p class="text-gray-600 text-sm mt-1">
-                  Chi bởi: {{ getMemberName(expense.paidBy) }}
-                </p>
-              </div>
-              <div class="text-right">
-                <p class="font-semibold text-gray-800">{{ formatCurrency(expense.amount) }}</p>
-                <div class="mt-2">
-                  <button 
-                    @click="startEdit(expense)"
-                    class="text-blue-600 hover:text-blue-800 transition-colors flex items-center text-sm mb-2"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Sửa
-                  </button>
-                  <button 
-                    @click="removeExpense(expense.id)"
-                    class="text-red-600 hover:text-red-800 transition-colors flex items-center text-sm"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Xóa
-                  </button>
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="flex items-center mb-2">
+                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-blue-600 font-semibold">{{ getMemberName(expense.paidBy).charAt(0) }}</span>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-gray-800">{{ expense.category }}</h3>
+                    <p class="text-sm text-gray-500">Trả bởi: {{ getMemberName(expense.paidBy) }}</p>
+                  </div>
                 </div>
+                <div class="ml-14">
+                  <p class="text-lg font-semibold text-green-600">{{ formatCurrency(expense.amount) }}</p>
+                  <div class="mt-2">
+                    <p class="text-sm text-gray-600">Chia cho:</p>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                      <span 
+                        v-for="memberId in expense.splitBetween" 
+                        :key="memberId"
+                        class="px-2 py-1 bg-gray-100 rounded-full text-sm text-gray-700"
+                      >
+                        {{ getMemberName(memberId) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex space-x-2 ml-4">
+                <button 
+                  @click="startEdit(expense)"
+                  class="text-blue-600 hover:text-blue-800 transition-colors flex items-center text-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Sửa
+                </button>
+                <button 
+                  @click="removeExpense(expense.id)"
+                  class="text-red-600 hover:text-red-800 transition-colors flex items-center text-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Xóa
+                </button>
               </div>
             </div>
           </div>
@@ -139,7 +196,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGroupStore } from '../stores/groupStore'
 
@@ -147,6 +204,7 @@ const route = useRoute()
 const router = useRouter()
 const groupStore = useGroupStore()
 const group = ref(null)
+const selectedMembers = ref([])
 const newExpense = ref({
   category: '',
   amount: '',
@@ -159,6 +217,19 @@ onMounted(() => {
   groupStore.setCurrentGroup(groupId)
   group.value = groupStore.getCurrentGroup
 })
+
+const isAllMembersSelected = computed(() => {
+  if (!group.value || !group.value.members || group.value.members.length === 0) return false
+  return selectedMembers.value.length === group.value.members.length
+})
+
+const toggleAllMembers = (e) => {
+  if (e.target.checked) {
+    selectedMembers.value = group.value.members.map(member => member.id)
+  } else {
+    selectedMembers.value = []
+  }
+}
 
 const formatInputAmount = (value) => {
   // Loại bỏ tất cả ký tự không phải số
@@ -181,25 +252,31 @@ const startEdit = (expense) => {
     ...expense,
     amount: formatInputAmount(expense.amount.toString())
   }
+  // Thiết lập lại danh sách thành viên được chọn
+  selectedMembers.value = expense.splitBetween || []
 }
 
 const cancelEdit = () => {
   editingExpense.value = null
+  selectedMembers.value = []
 }
 
 const saveEdit = () => {
   if (!editingExpense.value || !group.value) return
+  if (selectedMembers.value.length === 0) return
   
   const amount = parseInt(editingExpense.value.amount.replace(/[^\d]/g, ''))
   const updatedExpense = {
     category: editingExpense.value.category,
     amount: amount,
-    paidBy: editingExpense.value.paidBy
+    paidBy: editingExpense.value.paidBy,
+    splitBetween: [...selectedMembers.value]
   }
   
   try {
     groupStore.updateExpense(group.value.id, editingExpense.value.id, updatedExpense)
     editingExpense.value = null
+    selectedMembers.value = []
     group.value = groupStore.getCurrentGroup
   } catch (error) {
     console.error('Error updating expense:', error)
@@ -207,19 +284,25 @@ const saveEdit = () => {
 }
 
 const addExpense = () => {
+  if (selectedMembers.value.length === 0) return
+  
   // Chuyển đổi chuỗi số có định dạng thành số
   const amount = parseInt(newExpense.value.amount.replace(/[^\d]/g, ''))
   const expense = {
+    id: Date.now().toString(),
     category: newExpense.value.category,
     amount: amount,
-    paidBy: newExpense.value.paidBy
+    paidBy: newExpense.value.paidBy,
+    splitBetween: [...selectedMembers.value]
   }
+  
   groupStore.addExpense(group.value.id, expense)
   newExpense.value = {
     category: '',
     amount: '',
     paidBy: ''
   }
+  selectedMembers.value = []
   group.value = groupStore.getCurrentGroup
 }
 
@@ -247,7 +330,8 @@ defineExpose({
   saveEdit,
   addExpense,
   removeExpense,
-  handleAmountInput
+  handleAmountInput,
+  toggleAllMembers
 })
 </script>
 
