@@ -2,7 +2,7 @@
   <div class="expenses bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 py-8">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 sm:space-y-0">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">Chi tiêu nhóm {{ group?.name || 'Đang tải...' }}</h1>
+        <h1 class="text-2xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">Chi tiêu nhóm: {{ group?.name || 'Đang tải...' }}</h1>
         <div class="flex flex-row justify-between sm:justify-end sm:space-x-3 w-full sm:w-auto">
           <button 
             @click="navigateToSettlement"
@@ -11,7 +11,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
-            Xem kết quả
+            Chia tiền
           </button>
           <button 
             @click="navigateToGroup"
@@ -25,8 +25,8 @@
         </div>
       </div>
 
-      <div v-if="group" class="mb-8 bg-white p-6 rounded-lg shadow-sm">
-        <h2 class="text-xl font-semibold mb-6 text-gray-800">{{ editingExpense ? 'Chỉnh sửa chi tiêu' : 'Thêm chi tiêu mới' }}</h2>
+      <div v-if="group" id="expense-form" class="mb-8 bg-white p-6 rounded-lg shadow-sm">
+        <h2 id="expense-form-title" class="text-xl font-semibold mb-6 text-gray-800">{{ editingExpense ? 'Chỉnh sửa chi tiêu' : 'Thêm chi tiêu mới' }}</h2>
         <form @submit.prevent="editingExpense ? saveEdit() : addExpense()" class="space-y-6">
           <div>
             <label class="block mb-2 text-gray-700 font-medium">Danh mục:</label>
@@ -213,7 +213,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGroupStore } from '../stores/groupStore'
 import ConfirmPopup from '../components/ConfirmPopup.vue';
@@ -267,14 +267,22 @@ const handleAmountInput = (event) => {
   }
 }
 
+const scrollToEditSection = () => {
+  const editSection = document.getElementById('expense-form');
+  if (editSection) {
+    const top = editSection.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top, behavior: 'auto' });
+  }
+};
+
 const startEdit = (expense) => {
   editingExpense.value = {
     ...expense,
     amount: formatInputAmount(expense.amount.toString())
-  }
-  // Thiết lập lại danh sách thành viên được chọn
-  selectedMembers.value = expense.splitBetween || []
-}
+  };
+  selectedMembers.value = expense.splitBetween || [];
+  nextTick(() => scrollToEditSection());
+};
 
 const cancelEdit = () => {
   editingExpense.value = null

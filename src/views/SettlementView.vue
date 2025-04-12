@@ -3,7 +3,7 @@
     <div class="max-w-4xl mx-auto px-4 py-8">
       <div
         class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 sm:space-y-0">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">Chia tiền nhóm: {{ group?.name
+        <h1 class="text-2xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">Chia tiền nhóm: {{ group?.name
           || 'Đang tải...' }}</h1>
         <div class="flex flex-row justify-between sm:justify-end sm:space-x-3 w-full sm:w-auto">
           <button @click="navigateToExpenses"
@@ -12,7 +12,7 @@
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Thêm chi tiêu
+            Chi tiêu
           </button>
           <button @click="navigateToGroup"
             class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center w-[48%] sm:w-auto">
@@ -68,8 +68,8 @@
                   <ul class="ml-4">
                     <li v-for="expense in getMemberParticipationExpensesDetails(member.id)" :key="expense.id">
                       <details>
-                        <summary class="text-gray-500 text-xs cursor-pointer">
-                          {{ expense.category }}: {{ formatCurrency(expense.amount / expense.splitBetween.length) }}
+                        <summary class="text-gray-500 text-xs cursor-pointer mt-1">
+                          <u>{{ expense.category }}</u>: {{ formatCurrency(expense.amount / expense.splitBetween.length) }}
                         </summary>
                         <ul class="ml-4">
                           <li v-for="participant in expense.splitBetween" :key="participant">

@@ -11,7 +11,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Thêm chi tiêu
+            Chi tiêu
           </button>
           <button 
             @click="navigateToSettlement"
@@ -20,7 +20,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
-            Xem kết quả
+            Chia tiền
           </button>
         </div>
       </div>
@@ -120,7 +120,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGroupStore } from '../stores/groupStore'
 import ConfirmPopup from '../components/ConfirmPopup.vue';
@@ -143,13 +143,21 @@ onMounted(() => {
   console.log('Store actions:', Object.keys(groupStore))
 })
 
+const focusMemberInput = () => {
+  const inputElement = document.querySelector('input[type="text"]');
+  if (inputElement) {
+    inputElement.focus();
+  }
+};
+
 const addMember = () => {
   groupStore.addMember(group.value.id, newMember.value.name)
   newMember.value.name = ''
 }
 
 const startEdit = (member) => {
-  editingMember.value = { ...member }
+  editingMember.value = { ...member };
+  nextTick(() => focusMemberInput());
 }
 
 const cancelEdit = () => {
