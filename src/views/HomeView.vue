@@ -31,19 +31,17 @@
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Các nhóm của bạn</h2>
         <div class="grid gap-4">
           <div v-for="group in groups" :key="group.id"
-            class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-            @click="navigateToGroup(group.id)">
+            class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
             <div class="flex justify-between items-center">
-              <div>
+              <div @click="navigateToGroup(group.id)">
                 <h3 class="font-semibold text-gray-800">{{ group.name }}</h3>
                 <p class="text-gray-600 text-sm mt-1">
                   {{ group.members.length }} thành viên
                 </p>
               </div>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
+              <button @click.stop="showRemoveGroupPopup(group.id)" class="text-red-600 hover:text-red-800">
+                Xóa
+              </button>
             </div>
           </div>
 
@@ -59,6 +57,12 @@
         </div>
       </div>
     </div>
+    <ConfirmPopup
+      :visible="isConfirmPopupVisible"
+      message="Bạn có chắc chắn muốn xóa nhóm này không?"
+      @confirm="confirmRemoveGroup"
+      @cancel="cancelRemoveGroup"
+    />
   </div>
 </template>
 
@@ -66,6 +70,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGroupStore } from '../stores/groupStore'
+import ConfirmPopup from '../components/ConfirmPopup.vue'
 
 const router = useRouter()
 const groupStore = useGroupStore()
@@ -73,6 +78,8 @@ const groups = ref([])
 const newGroup = ref({
   name: ''
 })
+const isConfirmPopupVisible = ref(false)
+const groupToRemove = ref(null)
 
 onMounted(() => {
   groups.value = groupStore.groups
@@ -87,6 +94,25 @@ const createGroup = () => {
 const navigateToGroup = (groupId) => {
   router.push(`/group/${groupId}`)
 }
+
+const showRemoveGroupPopup = (groupId) => {
+  groupToRemove.value = groupId
+  isConfirmPopupVisible.value = true
+}
+
+const confirmRemoveGroup = () => {
+  if (groupToRemove.value) {
+    groupStore.removeGroup(groupToRemove.value)
+    groups.value = groupStore.groups
+  }
+  isConfirmPopupVisible.value = false
+  groupToRemove.value = null
+}
+
+const cancelRemoveGroup = () => {
+  isConfirmPopupVisible.value = false
+  groupToRemove.value = null
+}
 </script>
 
 <style scoped>
@@ -95,4 +121,4 @@ const navigateToGroup = (groupId) => {
   margin: 0 auto;
   padding: 0;
 }
-</style> 
+</style>
