@@ -65,6 +65,20 @@
                     </li>
                   </ul>
                   <p class="mt-2">Cần trả: {{ formatCurrency(getMemberParticipationExpenses(member.id)) }}</p>
+                  <ul class="ml-4">
+                    <li v-for="expense in getMemberParticipationExpensesDetails(member.id)" :key="expense.id">
+                      <details>
+                        <summary class="text-gray-500 text-xs cursor-pointer">
+                          {{ expense.category }}: {{ formatCurrency(expense.amount / expense.splitBetween.length) }}
+                        </summary>
+                        <ul class="ml-4">
+                          <li v-for="participant in expense.splitBetween" :key="participant">
+                            <span class="text-gray-600 text-xs">{{ getMemberName(participant) }}</span>
+                          </li>
+                        </ul>
+                      </details>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -195,6 +209,17 @@ const getMemberParticipationExpenses = (memberId) => {
   return totalShare
 }
 
+const getMemberParticipationExpensesDetails = (memberId) => {
+  if (!group.value) return []
+  
+  return group.value.expenses
+    .filter(expense => expense.splitBetween && expense.splitBetween.includes(memberId))
+    .map(expense => ({
+      ...expense,
+      splitBetween: expense.splitBetween
+    }))
+}
+
 const getMemberExpenses = (memberId) => {
   if (!group.value) return 0
   return group.value.expenses
@@ -263,6 +288,11 @@ const formatCurrency = (amount) => {
     maximumFractionDigits: 0
   }).format(amount);
 };
+
+const getMemberName = (memberId) => {
+  const member = group.value.members.find(m => m.id === memberId)
+  return member ? member.name : 'Unknown'
+}
 </script>
 
 <style scoped>

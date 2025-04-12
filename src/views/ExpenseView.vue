@@ -63,7 +63,7 @@
             >
               <option value="">Chọn thành viên</option>
               <option 
-                v-for="member in group.members" 
+                v-for="member in groupStore.getActiveMembers(group.id)" 
                 :key="member.id" 
                 :value="member.id"
               >
@@ -88,7 +88,7 @@
               
               <div class="mt-3 space-y-2 pl-6">
                 <div 
-                  v-for="member in group.members" 
+                  v-for="member in groupStore.getActiveMembers(group.id)" 
                   :key="member.id"
                   class="flex items-center"
                 >
@@ -245,9 +245,9 @@ const isAllMembersSelected = computed(() => {
 
 const toggleAllMembers = (e) => {
   if (e.target.checked) {
-    selectedMembers.value = group.value.members.map(member => member.id)
+    selectedMembers.value = groupStore.getActiveMembers(group.value.id).map(member => member.id);
   } else {
-    selectedMembers.value = []
+    selectedMembers.value = [];
   }
 }
 
