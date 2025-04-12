@@ -1,23 +1,23 @@
 <template>
   <div class="settlement bg-gray-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 sm:space-y-0">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 text-center sm:text-left">Kết quả chia tiền nhóm {{ group?.name || 'Đang tải...' }}</h1>
+      <div
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow-sm space-y-4 sm:space-y-0">
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-800 text-center sm:text-left">Chia tiền nhóm: {{ group?.name
+          || 'Đang tải...' }}</h1>
         <div class="flex flex-row justify-between sm:justify-end sm:space-x-3 w-full sm:w-auto">
-          <button 
-            @click="navigateToExpenses"
-            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center w-[48%] sm:w-auto"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button @click="navigateToExpenses"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center w-[48%] sm:w-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Thêm chi tiêu
           </button>
-          <button 
-            @click="router.back()"
-            class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center w-[48%] sm:w-auto"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button @click="navigateToGroup"
+            class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center w-[48%] sm:w-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Quay lại
@@ -46,46 +46,49 @@
       <div v-if="group" class="mb-8 bg-white p-6 rounded-lg shadow-sm">
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Chi tiết thanh toán</h2>
         <div class="grid gap-4">
-          <div 
-            v-for="member in group.members" 
-            :key="member.id"
-            class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0"
-          >
+          <div v-for="member in group.members" :key="member.id"
+            class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
             <div class="flex items-center">
               <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                 <span class="text-blue-600 font-semibold">{{ member.name.charAt(0) }}</span>
               </div>
               <div>
                 <h3 class="font-semibold text-gray-800">{{ member.name }}</h3>
-                <div class="text-gray-600 text-sm mt-1 space-y-1">
+                <div class="text-gray-600 text-sm mt-1">
                   <p>Đã chi: {{ formatCurrency(getMemberExpenses(member.id)) }}</p>
-                  <p>Cần trả: {{ formatCurrency(getMemberParticipationExpenses(member.id)) }}</p>
+                  <ul class="ml-4">
+                    <li v-for="expense in getMemberPaidExpenses(member.id)" :key="expense.id">
+                      <details>
+                        <summary class="text-gray-500 text-xs cursor-pointer">{{ expense.category }}: {{
+                          formatCurrency(expense.amount) }}</summary>
+                      </details>
+                    </li>
+                  </ul>
+                  <p class="mt-2">Cần trả: {{ formatCurrency(getMemberParticipationExpenses(member.id)) }}</p>
                 </div>
               </div>
             </div>
-            <div class="text-right sm:ml-4">
-              <p 
-                :class="{
+            <div class="flex flex-row justify-space-between items-center w-25 w-full">
+              <div class="text-left w-50">
+                <p :class="{
                   'text-green-600': getMemberBalance(member.id) > 0,
                   'text-red-600': getMemberBalance(member.id) < 0,
                   'text-gray-600': getMemberBalance(member.id) === 0
-                }"
-                class="font-semibold text-lg"
-              >
-                {{ formatCurrency(getMemberBalance(member.id)) }}
-              </p>
-              <p 
-                :class="{
+                }" class="text-sm">
+                  <span v-if="getMemberBalance(member.id) > 0">Cần thu</span>
+                  <span v-else-if="getMemberBalance(member.id) < 0">Cần trả</span>
+                  <span v-else>Đã cân bằng</span>
+                </p>
+              </div>
+              <div class="text-right w-50">
+                <p :class="{
                   'text-green-600': getMemberBalance(member.id) > 0,
                   'text-red-600': getMemberBalance(member.id) < 0,
                   'text-gray-600': getMemberBalance(member.id) === 0
-                }"
-                class="text-sm"
-              >
-                <span v-if="getMemberBalance(member.id) > 0">Cần thu</span>
-                <span v-else-if="getMemberBalance(member.id) < 0">Cần trả</span>
-                <span v-else>Đã cân bằng</span>
-              </p>
+                }" class="font-semibold text-lg">
+                  {{ formatCurrency(getMemberBalance(member.id)) }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -94,11 +97,8 @@
       <div v-if="group" class="bg-white p-6 rounded-lg shadow-sm">
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Hướng dẫn thanh toán</h2>
         <div class="space-y-4">
-          <div 
-            v-for="(payment, index) in paymentInstructions" 
-            :key="index"
-            class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
+          <div v-for="(payment, index) in paymentInstructions" :key="index"
+            class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0">
               <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                 <span class="text-blue-600 font-semibold">{{ index + 1 }}</span>
@@ -114,8 +114,10 @@
           </div>
 
           <div v-if="paymentInstructions.length === 0" class="text-center py-8 text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-gray-400" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p>Không cần thanh toán thêm</p>
             <p class="text-sm mt-2">Mọi người đã thanh toán đủ</p>
@@ -146,6 +148,10 @@ const navigateToExpenses = () => {
   if (group.value) {
     router.push(`/group/${group.value.id}/expenses`)
   }
+}
+
+const navigateToGroup = () => {
+  router.push(`/group/${group.value.id}`)
 }
 
 const totalExpenses = computed(() => {
@@ -194,6 +200,11 @@ const getMemberExpenses = (memberId) => {
   return group.value.expenses
     .filter(expense => expense.paidBy === memberId)
     .reduce((sum, expense) => sum + expense.amount, 0)
+}
+
+const getMemberPaidExpenses = (memberId) => {
+  if (!group.value) return []
+  return group.value.expenses.filter(expense => expense.paidBy === memberId)
 }
 
 const getMemberBalance = (memberId) => {
@@ -247,16 +258,17 @@ const paymentInstructions = computed(() => {
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(amount)
-}
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+};
 </script>
 
 <style scoped>
 .settlement {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
 }
-</style> 
+</style>
