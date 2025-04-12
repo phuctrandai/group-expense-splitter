@@ -80,7 +80,7 @@
             </div>
             <div class="flex flex-row justify-between sm:justify-end w-full sm:w-auto space-x-8">
               <button 
-                @click="removeMember(member.id)"
+                @click="showRemoveMemberPopup(member.id)"
                 class="bg-gray-100 rounded-lg text-red-600 hover:text-red-800 transition-colors flex items-center justify-center text-sm sm:w-[60px] py-2 w-50"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -111,12 +111,19 @@
       </div>
     </div>
   </div>
+  <ConfirmPopup
+    :visible="isConfirmPopupVisible"
+    message="Bạn có chắc chắn muốn xóa thành viên này không?"
+    @confirm="confirmRemoveMember"
+    @cancel="cancelRemoveMember"
+  />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGroupStore } from '../stores/groupStore'
+import ConfirmPopup from '../components/ConfirmPopup.vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -126,6 +133,8 @@ const newMember = ref({
   name: ''
 })
 const editingMember = ref(null)
+const isConfirmPopupVisible = ref(false);
+const memberToRemove = ref(null);
 
 onMounted(() => {
   const groupId = route.params.id
@@ -174,9 +183,23 @@ const saveMemberEdit = () => {
   }
 }
 
-const removeMember = (memberId) => {
-  groupStore.removeMember(group.value.id, memberId)
-}
+const showRemoveMemberPopup = (memberId) => {
+  memberToRemove.value = memberId;
+  isConfirmPopupVisible.value = true;
+};
+
+const confirmRemoveMember = () => {
+  if (memberToRemove.value) {
+    groupStore.removeMember(group.value.id, memberToRemove.value);
+  }
+  isConfirmPopupVisible.value = false;
+  memberToRemove.value = null;
+};
+
+const cancelRemoveMember = () => {
+  isConfirmPopupVisible.value = false;
+  memberToRemove.value = null;
+};
 
 const navigateToExpenses = () => {
   router.push(`/group/${group.value.id}/expenses`)
@@ -191,7 +214,9 @@ defineExpose({
   cancelEdit,
   saveMemberEdit,
   addMember,
-  removeMember,
+  showRemoveMemberPopup,
+  confirmRemoveMember,
+  cancelRemoveMember,
   navigateToExpenses,
   navigateToSettlement
 })
@@ -203,4 +228,4 @@ defineExpose({
   margin: 0 auto;
   padding: 0;
 }
-</style> 
+</style>

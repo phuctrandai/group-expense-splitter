@@ -173,7 +173,7 @@
               </div>
               <div class="flex flex-row justify-between sm:justify-end w-full sm:w-auto space-x-8">
                 <button 
-                  @click="removeExpense(expense.id)"
+                  @click="showRemoveExpensePopup(expense.id)"
                   class="bg-gray-100 rounded-lg text-red-600 hover:text-red-800 transition-colors flex items-center justify-center text-sm sm:w-[60px] py-2 w-50"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -203,6 +203,12 @@
         </div>
       </div>
     </div>
+    <ConfirmPopup
+      :visible="isConfirmPopupVisible"
+      message="Bạn có chắc chắn muốn xóa khoản chi tiêu này không?"
+      @confirm="confirmRemoveExpense"
+      @cancel="cancelRemoveExpense"
+    />
   </div>
 </template>
 
@@ -210,6 +216,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGroupStore } from '../stores/groupStore'
+import ConfirmPopup from '../components/ConfirmPopup.vue';
 
 const route = useRoute()
 const router = useRouter()
@@ -222,6 +229,8 @@ const newExpense = ref({
   paidBy: ''
 })
 const editingExpense = ref(null)
+const isConfirmPopupVisible = ref(false);
+const expenseToRemove = ref(null);
 
 onMounted(() => {
   const groupId = route.params.id
@@ -321,6 +330,24 @@ const removeExpense = (expenseId) => {
   groupStore.removeExpense(group.value.id, expenseId)
   group.value = groupStore.getCurrentGroup
 }
+
+const showRemoveExpensePopup = (expenseId) => {
+  expenseToRemove.value = expenseId;
+  isConfirmPopupVisible.value = true;
+};
+
+const confirmRemoveExpense = () => {
+  if (expenseToRemove.value) {
+    removeExpense(expenseToRemove.value);
+  }
+  isConfirmPopupVisible.value = false;
+  expenseToRemove.value = null;
+};
+
+const cancelRemoveExpense = () => {
+  isConfirmPopupVisible.value = false;
+  expenseToRemove.value = null;
+};
 
 const getMemberName = (memberId) => {
   const member = group.value.members.find(m => m.id === memberId)

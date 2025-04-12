@@ -10,7 +10,6 @@
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Tạo nhóm mới</h2>
         <form @submit.prevent="createGroup" class="space-y-6">
           <div>
-            <label class="block mb-2 text-gray-700 font-medium">Tên nhóm:</label>
             <input v-model="newGroup.name" type="text"
               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               required placeholder="Nhập tên nhóm của bạn">

@@ -68,7 +68,7 @@
                 </div>
               </div>
             </div>
-            <div class="flex flex-row justify-space-between items-center w-25 w-full">
+            <div class="flex flex-row justify-space-between items-center w-full">
               <div class="text-left w-50">
                 <p :class="{
                   'text-green-600': getMemberBalance(member.id) > 0,
