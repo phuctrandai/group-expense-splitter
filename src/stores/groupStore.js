@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { fireBaseCreateGroup, fireBaseAddMember, fireBaseRemoveMember, fireBaseAddExpense, fireBaseRemoveGroup, fireBaseGetMembers } from '../firebase';
 
 export const useGroupStore = defineStore('group', {
   state: () => {
@@ -31,6 +32,7 @@ export const useGroupStore = defineStore('group', {
       };
       this.groups.push(newGroup);
       this.saveToLocalStorage();
+      fireBaseCreateGroup(newGroup);
       return newGroup;
     },
 
@@ -44,6 +46,8 @@ export const useGroupStore = defineStore('group', {
         };
         group.members.push(newMember);
         this.saveToLocalStorage();
+        fireBaseAddMember(groupId, newMember);
+        return newMember;
       }
     },
 
@@ -54,14 +58,15 @@ export const useGroupStore = defineStore('group', {
         if (member) {
           member.isDeleted = true;
           this.saveToLocalStorage();
+          fireBaseRemoveMember(groupId, memberId);
         }
       }
     },
 
-    getActiveMembers(groupId) {
-      const group = this.groups.find(g => g.id === groupId);
-      if (group) {
-        return group.members.filter(m => !m.isDeleted);
+    async getActiveMembers(groupId) {
+      const members = await fireBaseGetMembers(groupId);
+      if (members) {
+        return members.filter(m => !m.isDeleted);
       }
       return [];
     },
@@ -73,6 +78,7 @@ export const useGroupStore = defineStore('group', {
         if (memberIndex !== -1) {
           group.members[memberIndex] = { ...group.members[memberIndex], ...updatedMember };
           this.saveToLocalStorage();
+          fireBaseAddMember(groupId, group.members[memberIndex]);
         }
       }
     },
@@ -86,6 +92,8 @@ export const useGroupStore = defineStore('group', {
         };
         group.expenses.push(newExpense);
         this.saveToLocalStorage();
+        fireBaseAddExpense(groupId, newExpense);
+        return newExpense;
       }
     },
 
@@ -94,6 +102,7 @@ export const useGroupStore = defineStore('group', {
       if (group) {
         group.expenses = group.expenses.filter(e => e.id !== expenseId);
         this.saveToLocalStorage();
+        fireBaseRemoveExpense(groupId, expenseId);
       }
     },
 
@@ -104,6 +113,7 @@ export const useGroupStore = defineStore('group', {
         if (expenseIndex !== -1) {
           group.expenses[expenseIndex] = { ...group.expenses[expenseIndex], ...updatedExpense };
           this.saveToLocalStorage();
+          fireBaseAddExpense(groupId, group.expenses[expenseIndex]);
         }
       }
     },
@@ -116,6 +126,7 @@ export const useGroupStore = defineStore('group', {
     removeGroup(groupId) {
       this.groups = this.groups.filter(group => group.id !== groupId);
       this.saveToLocalStorage();
+      fireBaseRemoveGroup(groupId);
     }
   }
 });

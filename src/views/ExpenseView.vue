@@ -63,7 +63,7 @@
             >
               <option value="">Chọn thành viên</option>
               <option 
-                v-for="member in groupStore.getActiveMembers(group.id)" 
+                v-for="member in activeMembers" 
                 :key="member.id" 
                 :value="member.id"
               >
@@ -88,7 +88,7 @@
               
               <div class="mt-3 space-y-2 pl-6">
                 <div 
-                  v-for="member in groupStore.getActiveMembers(group.id)" 
+                  v-for="member in activeMembers" 
                   :key="member.id"
                   class="flex items-center"
                 >
@@ -228,14 +228,16 @@ const newExpense = ref({
   amount: '',
   paidBy: ''
 })
+const activeMembers = ref([]);
 const editingExpense = ref(null)
 const isConfirmPopupVisible = ref(false);
 const expenseToRemove = ref(null);
 
-onMounted(() => {
+onMounted(async () => {
   const groupId = route.params.id
   groupStore.setCurrentGroup(groupId)
   group.value = groupStore.getCurrentGroup
+  activeMembers.value = await groupStore.getActiveMembers(groupId)
 })
 
 const isAllMembersSelected = computed(() => {
@@ -245,7 +247,7 @@ const isAllMembersSelected = computed(() => {
 
 const toggleAllMembers = (e) => {
   if (e.target.checked) {
-    selectedMembers.value = groupStore.getActiveMembers(group.value.id).map(member => member.id);
+    selectedMembers.value = activeMembers.map(member => member.id);
   } else {
     selectedMembers.value = [];
   }
